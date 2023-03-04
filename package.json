@@ -16,6 +16,10 @@
     "url": "https://github.com/joseospina47/cheezburger-downloader/issues"
   },
   "homepage": "https://github.com/joseospina47/cheezburger-downloader#readme",
+  "bin": {
+    "cheezburger": "./bin/index.js"
+  },
+  "type": "module",
   "devDependencies": {
     "eslint": "^8.35.0",
     "eslint-config-airbnb-base": "^15.0.0",
@@ -25,5 +29,9 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.8.4"
+  },
+  "dependencies": {
+    "inquirer": "^9.1.4",
+    "yargs": "^17.7.1"
   }
 }
