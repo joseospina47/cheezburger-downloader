@@ -1,0 +1,29 @@
+{
+  "name": "cheezburger-downloader",
+  "version": "1.0.0",
+  "description": "I Can Has Cheezburger? image downloader - CLI tool",
+  "main": "bin/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joseospina47/cheezburger-downloader.git"
+  },
+  "author": "Jose Ospina",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joseospina47/cheezburger-downloader/issues"
+  },
+  "homepage": "https://github.com/joseospina47/cheezburger-downloader#readme",
+  "devDependencies": {
+    "eslint": "^8.35.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-node": "^4.1.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.8.4"
+  }
+}
