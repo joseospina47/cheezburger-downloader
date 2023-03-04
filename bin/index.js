@@ -1,8 +1,10 @@
-#! /usr/bin/env node
+#!/usr/bin/env node
 
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import inquirer from 'inquirer';
+
+import downloadImages from './api.js';
 
 const options = {
   amount: {
@@ -11,6 +13,7 @@ const options = {
     type: 'number',
     demandOption: true,
     default: 1,
+    validate: (input) => input > 0,
   },
   threads: {
     message: 'How many threads do you want to use? (Default 1)',
@@ -18,6 +21,7 @@ const options = {
     type: 'number',
     demandOption: true,
     default: 1,
+    validate: (input) => input > 0,
   },
   output: {
     message: 'What is the output folder?',
@@ -28,16 +32,20 @@ const options = {
   },
 };
 
-(async () => {
-  const answers = await inquirer.prompt(Object.values(options), (reply) =>
-    console.log(reply.confirmed)
+const promptUser = async () => {
+  const answers = await inquirer.prompt(Object.values(options));
+  const args = Object.entries(answers).map(
+    ([key, value]) => `--${key}=${value}`
   );
+  return args;
+};
 
-  Object.entries(answers).forEach(([key, value]) => {
-    process.argv.push(`--${key}`, value);
-  });
+const main = async () => {
+  const args = await promptUser();
+  const { amount, output } = yargs(hideBin([...process.argv, ...args])).options(
+    options
+  ).argv;
+  await downloadImages(amount, output);
+};
 
-  const parameters = yargs(hideBin(process.argv)).options(options).argv;
-
-  console.log(parameters);
-})();
+main();
