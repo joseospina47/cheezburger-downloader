@@ -21,11 +21,24 @@ const parseArgs = (args) => {
   return { amount, output };
 };
 
+const download = async ({ amount, output }) => {
+  const start = Date.now();
+
+  const spinner = ora(
+    `Downloading ${amount} image${amount > 1 ? 's' : ''}`
+  ).start();
+  await downloadImages(amount, output);
+
+  const totalTime = (Date.now() - start) / 1000;
+  spinner.succeed(`Download complete in ${totalTime} seconds`);
+};
+
 const main = async () => {
   try {
     const args = await promptUser();
     const { amount, output } = parseArgs([...process.argv, ...args]);
-    await downloadImages(amount, output);
+
+    await download({ amount, output });
   } catch (error) {
     console.error(`Error downloading images: ${error.message}`);
     process.exit(1);
