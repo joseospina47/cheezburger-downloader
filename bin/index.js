@@ -1,51 +1,35 @@
 #!/usr/bin/env node
 
+import inquirer from 'inquirer';
+import ora from 'ora';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import inquirer from 'inquirer';
 
-import downloadImages from './api.js';
-
-const options = {
-  amount: {
-    message: 'How many images do you want to download?',
-    name: 'amount',
-    type: 'number',
-    demandOption: true,
-    default: 1,
-    validate: (input) => input > 0,
-  },
-  threads: {
-    message: 'How many threads do you want to use? (Default 1)',
-    name: 'threads',
-    type: 'number',
-    demandOption: true,
-    default: 1,
-    validate: (input) => input > 0,
-  },
-  output: {
-    message: 'What is the output folder?',
-    name: 'output',
-    type: 'string',
-    demandOption: true,
-    validate: (input) => !!input,
-  },
-};
+import downloadImages from './images.js';
+import options from './options.js';
 
 const promptUser = async () => {
   const answers = await inquirer.prompt(Object.values(options));
-  const args = Object.entries(answers).map(
-    ([key, value]) => `--${key}=${value}`
-  );
-  return args;
+  return Object.entries(answers).map(([key, value]) => `--${key}=${value}`);
+};
+
+const parseArgs = (args) => {
+  const { amount, output } = yargs(hideBin(args))
+    .options(options)
+    .strict().argv;
+
+  return { amount, output };
 };
 
 const main = async () => {
-  const args = await promptUser();
-  const { amount, output } = yargs(hideBin([...process.argv, ...args])).options(
-    options
-  ).argv;
-  await downloadImages(amount, output);
+  try {
+    const args = await promptUser();
+    const { amount, output } = parseArgs([...process.argv, ...args]);
+    await downloadImages(amount, output);
+  } catch (error) {
+    console.error(`Error downloading images: ${error.message}`);
+    process.exit(1);
+  }
 };
 
 main();
