@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 import inquirer from 'inquirer';
-import ora from 'ora';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
+import displayProgress from './progress.js';
 import downloadImages from './images.js';
 import { OPTIONS } from './constants.js';
 
@@ -21,26 +21,15 @@ const parseArgs = (args) => {
   return { amount, threads, output };
 };
 
-const startDownload = async (imageAmount, workerAmount, output) => {
-  const start = Date.now();
-
-  const spinner = ora(
-    `Downloading ${imageAmount} image${imageAmount > 1 ? 's' : ''}`
-  ).start();
-  await downloadImages(imageAmount, workerAmount, output);
-
-  const totalTime = (Date.now() - start) / 1000;
-  spinner.succeed(`Download complete in ${totalTime} seconds`);
-};
-
 const init = async () => {
   try {
     const args = await promptUser();
     const { amount, threads, output } = parseArgs([...process.argv, ...args]);
-
-    await startDownload(amount, threads, output);
+    const { onProgress, onFinish } = displayProgress(amount);
+    await downloadImages(amount, threads, output, onProgress);
+    onFinish();
   } catch (error) {
-    console.error(`\n\nError downloading images: ${error.message}`);
+    console.error(`\n\nError downloading images: ${error.message}.`);
     process.exit(1);
   }
 };
