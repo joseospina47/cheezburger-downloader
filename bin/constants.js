@@ -1,4 +1,4 @@
-const options = {
+export const OPTIONS = {
   amount: {
     message: 'How many images do you want to download?',
     name: 'amount',
@@ -24,4 +24,4 @@ const options = {
   },
 };
 
-export default options;
+export const CHEEZBURGER_URL = 'https://search.cheezburger.com/api/search';

@@ -6,43 +6,45 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
 import downloadImages from './images.js';
-import options from './options.js';
+import { OPTIONS } from './constants.js';
 
 const promptUser = async () => {
-  const answers = await inquirer.prompt(Object.values(options));
+  const answers = await inquirer.prompt(Object.values(OPTIONS));
   return Object.entries(answers).map(([key, value]) => `--${key}=${value}`);
 };
 
 const parseArgs = (args) => {
-  const { amount, output } = yargs(hideBin(args))
-    .options(options)
+  console.log(yargs(hideBin(args)).options(OPTIONS).strict().argv);
+
+  const { amount, threads, output } = yargs(hideBin(args))
+    .options(OPTIONS)
     .strict().argv;
 
-  return { amount, output };
+  return { amount, threads, output };
 };
 
-const download = async ({ amount, output }) => {
+const startDownload = async (imageAmount, workerAmount, output) => {
   const start = Date.now();
 
   const spinner = ora(
-    `Downloading ${amount} image${amount > 1 ? 's' : ''}`
+    `Downloading ${imageAmount} image${imageAmount > 1 ? 's' : ''}`
   ).start();
-  await downloadImages(amount, output);
+  await downloadImages(imageAmount, workerAmount, output);
 
   const totalTime = (Date.now() - start) / 1000;
   spinner.succeed(`Download complete in ${totalTime} seconds`);
 };
 
-const main = async () => {
+const init = async () => {
   try {
     const args = await promptUser();
-    const { amount, output } = parseArgs([...process.argv, ...args]);
+    const { amount, threads, output } = parseArgs([...process.argv, ...args]);
 
-    await download({ amount, output });
+    await startDownload(amount, threads, output);
   } catch (error) {
-    console.error(`Error downloading images: ${error.message}`);
+    console.error(`\n\nError downloading images: ${error.message}`);
     process.exit(1);
   }
 };
 
-main();
+init();
