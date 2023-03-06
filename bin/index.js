@@ -36,9 +36,9 @@ const startDownload = async (imageAmount, workerAmount, output) => {
 const init = async () => {
   try {
     const args = await promptUser();
-    const { amount, output } = parseArgs([...process.argv, ...args]);
+    const { amount, threads, output } = parseArgs([...process.argv, ...args]);
 
-    await startDownload(amount, output);
+    await startDownload(amount, threads, output);
   } catch (error) {
     console.error(`\n\nError downloading images: ${error.message}`);
     process.exit(1);

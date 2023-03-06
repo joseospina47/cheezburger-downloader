@@ -1,4 +1,5 @@
-import download from 'download';
+import { StaticPool } from 'node-worker-threads-pool';
+import path from 'path';
 
 import { CHEEZBURGER_URL } from './constants.js';
 
@@ -22,15 +23,22 @@ const fetchImages = async (imagesAmount) => {
   return images;
 };
 
-const downloadImages = async (imageAmount, output) => {
+const downloadImages = async (imageAmount, workerAmount, output) => {
   const images = await fetchImages(imageAmount);
+  const currentDir = path.dirname(new URL(import.meta.url).pathname);
+
+  const workerPool = new StaticPool({
+    size: workerAmount,
+    task: `${currentDir}/download-worker.js`,
+  });
 
   const promises = images.map(async (image) => {
     const imageUrl = image.ThumbnailUrl.replace('thumb400', 'full');
-    await download(imageUrl, output);
+    await workerPool.exec({ imageUrl, output });
   });
 
   await Promise.all(promises);
+  workerPool.destroy();
 };
 
 export default downloadImages;
