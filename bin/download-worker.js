@@ -6,7 +6,7 @@ const downloadWorker = async (imageUrl, output) => {
     const result = await download(imageUrl, output);
     parentPort.postMessage(result);
   } catch (error) {
-    throw new Error(`\n\nFailed to download image: ${error.message}`);
+    console.error(`\n\nError saving the image: ${imageUrl} - ${error.message}`);
   }
 };
 

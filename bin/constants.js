@@ -13,7 +13,7 @@ export const OPTIONS = {
     type: 'number',
     demandOption: true,
     default: 1,
-    validate: (input) => input > 0,
+    validate: (input) => input >= 1 && input <= 5,
   },
   output: {
     message: 'What is the output folder?',
