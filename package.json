@@ -31,7 +31,9 @@
     "prettier": "^2.8.4"
   },
   "dependencies": {
+    "download": "^8.0.0",
     "inquirer": "^9.1.4",
+    "node-worker-threads-pool": "^1.5.1",
     "yargs": "^17.7.1"
   }
 }

@@ -14,8 +14,6 @@ const promptUser = async () => {
 };
 
 const parseArgs = (args) => {
-  console.log(yargs(hideBin(args)).options(OPTIONS).strict().argv);
-
   const { amount, threads, output } = yargs(hideBin(args))
     .options(OPTIONS)
     .strict().argv;
@@ -38,9 +36,9 @@ const startDownload = async (imageAmount, workerAmount, output) => {
 const init = async () => {
   try {
     const args = await promptUser();
-    const { amount, threads, output } = parseArgs([...process.argv, ...args]);
+    const { amount, output } = parseArgs([...process.argv, ...args]);
 
-    await startDownload(amount, threads, output);
+    await startDownload(amount, output);
   } catch (error) {
     console.error(`\n\nError downloading images: ${error.message}`);
     process.exit(1);
