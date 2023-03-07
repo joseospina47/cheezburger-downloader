@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 import inquirer from 'inquirer';
+import ora from 'ora';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
-import displayProgress from './progress.js';
 import downloadImages from './images.js';
 import options from './options.js';
 
@@ -19,6 +19,18 @@ const parseArgs = (args) => {
     .strict().argv;
 
   return { amount, threads, output };
+};
+
+const displayProgress = () => {
+  const start = Date.now();
+  const spinner = ora(`Downloading images...\n`).start();
+
+  const onFinish = () => {
+    const totalTime = (Date.now() - start) / 1000;
+    spinner.succeed(`Download complete in ${totalTime} seconds.`);
+  };
+
+  return onFinish;
 };
 
 const init = async () => {
