@@ -49,7 +49,7 @@ const downloadImages = async (imageAmount, workerAmount, output) => {
     }
 
     await Promise.all(workerPromises);
-    workerPool.destroy();
+    await workerPool.destroy();
   } catch (error) {
     console.error(`\nError downloading images: ${error.message}.`);
   }
