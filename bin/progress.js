@@ -1,33 +1,15 @@
-import emoji from 'node-emoji';
-import ProgressBar from 'progress';
+import ora from 'ora';
 
-const displayProgress = (amount) => {
-  const computer = emoji.get('computer');
-  const download = emoji.get('arrow_heading_down');
-  const checkMark = emoji.get('white_check_mark');
+const displayProgress = () => {
   const start = Date.now();
-
-  console.log(`\n${computer}  Setting everything up...\n`);
-  const progressBar = new ProgressBar(
-    `${download}  Downloading [:bar] :percent`,
-    { total: amount, width: 40, clear: true }
-  );
-
-  const onProgress = () => {
-    progressBar.tick();
-  };
+  const spinner = ora(`Downloading images...\n`).start();
 
   const onFinish = () => {
-    progressBar.terminate();
-    console.log(
-      `${checkMark}  Downloaded image(s) in ${(Date.now() - start) / 1000} seconds.`
-    );
+    const totalTime = (Date.now() - start) / 1000;
+    spinner.succeed(`Download complete in ${totalTime} seconds.`);
   };
 
-  return {
-    onProgress,
-    onFinish,
-  };
+  return onFinish;
 };
 
 export default displayProgress;

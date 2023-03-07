@@ -19,36 +19,36 @@ const getImagesList = async (imagesAmount) => {
   }
 };
 
+const getChunk = (workerAmount, index, images) => {
+  const chunkSize = Math.ceil(images.length / workerAmount);
+  const startIndex = index * chunkSize;
+  const endIndex = (index + 1) * chunkSize;
+  const imageChunk = images.slice(startIndex, endIndex);
+  const sanitizedChunk = imageChunk.map((image) =>
+    image.ThumbnailUrl.replace('thumb400', 'full')
+  );
+
+  return sanitizedChunk;
+};
+
 // Creates the pool and put each worker to download images.
-const downloadImages = async (
-  imageAmount,
-  workerAmount,
-  output,
-  onProgress
-) => {
+const downloadImages = async (imageAmount, workerAmount, output) => {
   try {
     const images = await getImagesList(imageAmount);
     const currentDir = path.dirname(new URL(import.meta.url).pathname);
-
-    // Necessary for the CLI progress bar.
-    const progressIncrement = 1 / images.length;
-    let progress = 0;
 
     const workerPool = new StaticPool({
       size: workerAmount,
       task: `${currentDir}/download-worker.js`,
     });
 
-    const promises = images.map(async (image) => {
-      const imageUrl = image.ThumbnailUrl.replace('thumb400', 'full');
-      await workerPool.exec({ imageUrl, output });
+    const workerPromises = [];
+    for (let i = 0; i < workerAmount; i++) {
+      const imagesUrl = getChunk(workerAmount, i, images);
+      workerPromises.push(workerPool.exec({ imagesUrl, output }));
+    }
 
-      progress += progressIncrement;
-      onProgress(progress, imageAmount);
-    });
-
-    await Promise.all(promises);
-
+    await Promise.all(workerPromises);
     workerPool.destroy();
   } catch (error) {
     console.error(`\nError downloading images: ${error.message}.`);
