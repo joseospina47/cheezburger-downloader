@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/joseospina47/cheezburger-downloader#readme",
   "bin": {
-    "cheezburger": "./bin/index.js"
+    "cheezburger2": "./bin/index.js"
   },
   "type": "module",
   "devDependencies": {
