@@ -13,11 +13,11 @@ const displayProgress = (amount) => {
     { total: amount, width: 40, clear: true }
   );
 
-  const onProgress = () => {
+  const trackPogress = () => {
     progressBar.tick();
   };
 
-  const onFinish = () => {
+  const terminateProgress = () => {
     progressBar.terminate();
     console.log(
       `${checkMark}  Downloaded image(s) in ${(Date.now() - start) / 1000} seconds.`
@@ -25,8 +25,8 @@ const displayProgress = (amount) => {
   };
 
   return {
-    onProgress,
-    onFinish,
+    trackPogress,
+    terminateProgress,
   };
 };
 

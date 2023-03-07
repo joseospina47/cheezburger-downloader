@@ -24,15 +24,11 @@ const downloadImages = async (
   imageAmount,
   workerAmount,
   output,
-  onProgress
+  trackPogress
 ) => {
   try {
     const images = await getImagesList(imageAmount);
     const currentDir = path.dirname(new URL(import.meta.url).pathname);
-
-    // Necessary for the CLI progress bar.
-    const progressIncrement = 1 / images.length;
-    let progress = 0;
 
     const workerPool = new StaticPool({
       size: workerAmount,
@@ -43,13 +39,11 @@ const downloadImages = async (
       const imageUrl = image.ThumbnailUrl.replace('thumb400', 'full');
       await workerPool.exec({ imageUrl, output });
 
-      progress += progressIncrement;
-      onProgress(progress, imageAmount);
+      trackPogress();
     });
 
     await Promise.all(promises);
-
-    workerPool.destroy();
+    await workerPool.destroy();
   } catch (error) {
     console.error(`\nError downloading images: ${error.message}.`);
   }

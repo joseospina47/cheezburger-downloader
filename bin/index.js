@@ -25,9 +25,9 @@ const init = async () => {
   try {
     const args = await promptUser();
     const { amount, threads, output } = parseArgs([...process.argv, ...args]);
-    const { onProgress, onFinish } = displayProgress(amount);
-    await downloadImages(amount, threads, output, onProgress);
-    onFinish();
+    const { trackPogress, terminateProgress } = displayProgress(amount);
+    await downloadImages(amount, threads, output, trackPogress);
+    terminateProgress();
   } catch (error) {
     console.error(`\nError processing images: ${error.message}.`);
     process.exit(1);
