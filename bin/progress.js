@@ -10,7 +10,7 @@ const displayProgress = (amount) => {
   console.log(`\n${computer}  Setting everything up...\n`);
   const progressBar = new ProgressBar(
     `${download}  Downloading [:bar] :percent`,
-    { total: amount, width: 40, clear: true, }
+    { total: amount, width: 40, clear: true }
   );
 
   const onProgress = () => {
@@ -20,7 +20,7 @@ const displayProgress = (amount) => {
   const onFinish = () => {
     progressBar.terminate();
     console.log(
-      `\n${checkMark}  Downloaded ${amount} image(s) in ${(Date.now() - start) / 1000} seconds.`
+      `${checkMark}  Downloaded image(s) in ${(Date.now() - start) / 1000} seconds.`
     );
   };
 

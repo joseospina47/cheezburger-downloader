@@ -2,7 +2,7 @@ import axios from 'axios';
 import path from 'path';
 import { StaticPool } from 'node-worker-threads-pool';
 
-import { CHEEZBURGER_URL } from './constants.js';
+export const cheezburgerUrl = 'https://search.cheezburger.com/api/search';
 
 const getImagesList = async (imagesAmount) => {
   const formData = new FormData();
@@ -10,11 +10,11 @@ const getImagesList = async (imagesAmount) => {
   formData.append('q', 'cats'); // Search criteria
 
   try {
-    const response = await axios.post(CHEEZBURGER_URL, formData);
+    const response = await axios.post(cheezburgerUrl, formData);
     return response.data.Results;
   } catch (error) {
     throw new Error(
-      `Failed getting image list from ${CHEEZBURGER_URL} (error ${error.message}).`
+      `Failed getting image list from ${cheezburgerUrl} (error ${error.message}).`
     );
   }
 };
@@ -39,7 +39,7 @@ const downloadImages = async (
       task: `${currentDir}/download-worker.js`,
     });
 
-    const promises = images.map(async (image, index) => {
+    const promises = images.map(async (image) => {
       const imageUrl = image.ThumbnailUrl.replace('thumb400', 'full');
       await workerPool.exec({ imageUrl, output });
 
@@ -51,7 +51,7 @@ const downloadImages = async (
 
     workerPool.destroy();
   } catch (error) {
-    console.error(`\n\nError processing images: ${error.message}.`);
+    console.error(`\nError downloading images: ${error.message}.`);
   }
 };
 

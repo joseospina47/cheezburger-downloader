@@ -6,16 +6,16 @@ import { hideBin } from 'yargs/helpers';
 
 import displayProgress from './progress.js';
 import downloadImages from './images.js';
-import { OPTIONS } from './constants.js';
+import options from './options.js';
 
 const promptUser = async () => {
-  const answers = await inquirer.prompt(Object.values(OPTIONS));
+  const answers = await inquirer.prompt(Object.values(options));
   return Object.entries(answers).map(([key, value]) => `--${key}=${value}`);
 };
 
 const parseArgs = (args) => {
   const { amount, threads, output } = yargs(hideBin(args))
-    .options(OPTIONS)
+    .options(options)
     .strict().argv;
 
   return { amount, threads, output };
@@ -29,7 +29,7 @@ const init = async () => {
     await downloadImages(amount, threads, output, onProgress);
     onFinish();
   } catch (error) {
-    console.error(`\n\nError downloading images: ${error.message}.`);
+    console.error(`\nError processing images: ${error.message}.`);
     process.exit(1);
   }
 };

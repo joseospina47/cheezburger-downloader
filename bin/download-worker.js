@@ -26,7 +26,7 @@ parentPort.on('message', async ({ imageUrl, output }) => {
     await downloadImage(imageUrl, output);
     parentPort.postMessage('success');
   } catch (error) {
-    console.error(`Error saving the image: ${imageUrl} - ${error.message}.`);
+    console.error(`\nError saving image: ${imageUrl} - ${error.message}.\n`);
     parentPort.postMessage('error');
   }
 });
