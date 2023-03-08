@@ -11,7 +11,7 @@ Cheezburger Downloader is a Node.js command-line application that allows you to 
 
 ## Installation
 
-To install Cheezburger Downloader, you must first have Node.js v18.0.0 or greater and NPM (Node Package Manager) installed on your machine. Once you have these prerequisites installed, follow these steps:
+To install Cheezburger Downloader, you must first have Node.js v18.14.2 or greater and NPM (Node Package Manager) installed on your machine. Once you have these prerequisites installed, follow these steps:
 
 1. Clone the repository: `git clone https://github.com/joseospina47/cheezburger-downloader.git`
 2. Navigate to the project directory: `cd cheezburger-downloader`
