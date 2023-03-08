@@ -4,22 +4,46 @@ import { StaticPool } from 'node-worker-threads-pool';
 
 export const cheezburgerUrl = 'https://search.cheezburger.com/api/search';
 
-const getImagesList = async (imagesAmount) => {
+const getFormData = (index, chunkSize, imagesAmount) => {
+  const page = index + 1;
+  const start = index * chunkSize;
+  const end = Math.min(page * chunkSize, imagesAmount);
+
   const formData = new FormData();
-  formData.append('pageSize', imagesAmount);
-  formData.append('q', 'cats'); // Search criteria
+  formData.append('pageSize', end - start);
+  formData.append('q', 'cats');
+  formData.append('page', page);
+
+  return formData;
+};
+
+const getImagesList = async (imagesAmount) => {
+  const chunkSize = imagesAmount > 5000 ? 5000 : imagesAmount;
+  const numChunks = Math.ceil(imagesAmount / chunkSize);
+  const imageList = [];
 
   try {
-    const response = await axios.post(cheezburgerUrl, formData);
-    return response.data.Results;
+    // Iterate over each pagination and retrieves the list.
+    const responses = await Promise.all(
+      Array.from({ length: numChunks }, (element, index) => {
+        const formData = getFormData(index, chunkSize, imagesAmount);
+        return axios.post(cheezburgerUrl, formData, {
+          timeout: 1800000,
+        });
+      })
+    );
+
+    imageList.push(...responses.flatMap((response) => response.data.Results));
   } catch (error) {
     throw new Error(
       `Failed getting image list from ${cheezburgerUrl} (error ${error.message}).`
     );
   }
+
+  return imageList;
 };
 
-const getChunk = (workerAmount, index, images) => {
+const getUrlChunk = (workerAmount, index, images) => {
   const chunkSize = Math.ceil(images.length / workerAmount);
   const startIndex = index * chunkSize;
   const endIndex = (index + 1) * chunkSize;
@@ -31,7 +55,7 @@ const getChunk = (workerAmount, index, images) => {
   return sanitizedChunk;
 };
 
-// Creates the pool and put each worker to download images.
+// Creates the pool and passes a url chunk to each one.
 const downloadImages = async (imageAmount, workerAmount, output) => {
   try {
     const images = await getImagesList(imageAmount);
@@ -44,7 +68,7 @@ const downloadImages = async (imageAmount, workerAmount, output) => {
 
     const workerPromises = [];
     for (let i = 0; i < workerAmount; i++) {
-      const imagesUrl = getChunk(workerAmount, i, images);
+      const imagesUrl = getUrlChunk(workerAmount, i, images);
       workerPromises.push(workerPool.exec({ imagesUrl, output }));
     }
 
