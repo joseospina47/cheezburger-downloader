@@ -4,19 +4,42 @@ import { StaticPool } from 'node-worker-threads-pool';
 
 export const cheezburgerUrl = 'https://search.cheezburger.com/api/search';
 
-const getImagesList = async (imagesAmount) => {
+const getFormData = (index, chunkSize, imagesAmount) => {
+  const page = index + 1;
+  const start = index * chunkSize;
+  const end = Math.min(page * chunkSize, imagesAmount);
+
   const formData = new FormData();
-  formData.append('pageSize', imagesAmount);
-  formData.append('q', 'cats'); // Search criteria
+  formData.append('pageSize', end - start);
+  formData.append('q', 'cats');
+  formData.append('page', page);
+
+  return formData;
+};
+
+const getImagesList = async (imagesAmount) => {
+  const chunkSize = imagesAmount > 5000 ? 5000 : imagesAmount;
+  const numChunks = Math.ceil(imagesAmount / chunkSize);
+  const imageList = [];
 
   try {
-    const response = await axios.post(cheezburgerUrl, formData);
-    return response.data.Results;
+    const responses = await Promise.all(
+      Array.from({ length: numChunks }, (element, index) => {
+        const formData = getFormData(index, chunkSize, imagesAmount);
+        return axios.post(cheezburgerUrl, formData, {
+          timeout: 1800000,
+        });
+      })
+    );
+
+    imageList.push(...responses.flatMap((response) => response.data.Results));
   } catch (error) {
     throw new Error(
       `Failed getting image list from ${cheezburgerUrl} (error ${error.message}).`
     );
   }
+
+  return imageList;
 };
 
 // Creates the pool and put each worker to download images.

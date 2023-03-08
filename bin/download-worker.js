@@ -5,13 +5,19 @@ import path from 'path';
 import { pipeline } from 'stream/promises';
 
 const downloadImage = async (imageUrl, output) => {
-  const response = await axios.get(imageUrl, { responseType: 'stream' });
+  const response = await axios.get(imageUrl, {
+    responseType: 'stream',
+    timeout: 1800000,
+  });
   const contentType = response.headers['content-type'];
   const fileExt = contentType.split('/')[1];
   const fileName = path.basename(imageUrl, path.extname(imageUrl));
 
   const dest = fs.createWriteStream(`${output}/${fileName}.${fileExt}`);
   await pipeline(response.data, dest);
+
+  response.data.destroy();
+  dest.end();
 };
 
 const validateDirectory = (directory) => {
